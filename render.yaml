@@ -1,0 +1,29 @@
+services:
+  - name: edgeiq-phishsim
+    env: python3.11
+    region: oregon
+    repo: https://github.com/snipercat69/edgeiq-phishsim
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: FLASK_APP=app.py python3 -m flask run --host=0.0.0.0 --port=10000
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: APP_URL
+        value: https://simulate.edgeiqlabs.com
+        sync: false
+      - key: FROM_NAME
+        value: EdgeIQ Security
+        sync: false
+      - key: SENDING_DOMAIN
+        value: simulate.edgeiqlabs.com
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
