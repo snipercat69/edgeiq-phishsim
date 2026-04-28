@@ -2,7 +2,7 @@ services:
   - name: edgeiq-phishsim
     env: python3.11
     region: oregon
-    repo: https://github.com/snipercat69/edgeiq-phishsim
+    repo: https://github.com/EdgeIQ-Labs/edgeiq-phishsim
     branch: main
     buildCommand: pip install -r requirements.txt
     startCommand: FLASK_APP=app.py python3 -m flask run --host=0.0.0.0 --port=10000
