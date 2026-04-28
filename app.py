@@ -50,10 +50,11 @@ def _now():
     return datetime.utcnow().isoformat()
 
 def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
-    """Send email via SMTP. Returns True on success."""
+    """Send email via SMTP. Returns (success, error_detail)."""
     if not SMTP_USER or not SMTP_PASS:
-        print(f"[DEBUG] SMTP not configured — would send to {to_email}: {subject}")
-        return True
+        detail = 'SMTP_USER or SMTP_PASS missing'
+        print(f"[DEBUG] SMTP not configured — would send to {to_email}: {subject} | {detail}")
+        return True, detail
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
@@ -70,15 +71,22 @@ def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
     msg.attach(html_part)
 
     try:
+        print(
+            f"[DEBUG] SMTP attempt host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} "
+            f"from=noreply@{SENDING_DOMAIN} to={to_email}"
+        )
         context = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+            server.set_debuglevel(1)
             server.starttls(context=context)
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(f"noreply@{SENDING_DOMAIN}", to_email, msg.as_string())
-        return True
+        print(f"[DEBUG] SMTP send succeeded to {to_email}")
+        return True, None
     except Exception as e:
-        print(f"[ERROR] SMTP send failed: {e}")
-        return False
+        detail = f"{type(e).__name__}: {e}"
+        print(f"[ERROR] SMTP send failed host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} detail={detail}")
+        return False, detail
 
 def _render_template(template_html, template_vars):
     """Simple variable substitution: {{variable_name}}"""
@@ -294,22 +302,34 @@ def launch_campaign(cid):
 
         # Send
         subject = _substitute_target_vars(template['subject'], target)
-        ok = _send_email(target['email'], subject, html_body, tracking_id)
+        ok, error_detail = _send_email(target['email'], subject, html_body, tracking_id)
 
         if ok:
             send_record['sent_at'] = _now()
             sent += 1
         else:
+            send_record['error'] = error_detail
             failed += 1
 
     if sent > 0:
         campaign['status'] = 'running'
 
+    failed_details = [
+        {
+            'target_id': s.get('target_id'),
+            'email': _store['targets'].get(s.get('target_id'), {}).get('email', ''),
+            'error': s.get('error')
+        }
+        for s in _store['campaign_sends'].values()
+        if s.get('campaign_id') == cid and s.get('error')
+    ]
+
     return jsonify({
         'campaign_id': cid,
         'sent': sent,
         'failed': failed,
-        'status': campaign['status']
+        'status': campaign['status'],
+        'failed_details': failed_details
     })
 
 @app.route('/api/campaigns/<cid>/abort', methods=['POST'])
