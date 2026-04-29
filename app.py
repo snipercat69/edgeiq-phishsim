@@ -76,11 +76,11 @@ def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
             f"from=noreply@{SENDING_DOMAIN} to={to_email}"
         )
         context = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
             server.set_debuglevel(1)
             server.starttls(context=context)
-            server.login(SMTP_USER, SMTP_PASS)
-            server.sendmail(f"noreply@{SENDING_DOMAIN}", to_email, msg.as_string())
+            server.login(SMTP_USER, SMTP_PASS, timeout=10)
+            server.sendmail(f"noreply@{SENDING_DOMAIN}", to_email, msg.as_string(), timeout=10)
         print(f"[DEBUG] SMTP send succeeded to {to_email}")
         return True, None
     except Exception as e:
