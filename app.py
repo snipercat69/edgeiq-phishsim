@@ -731,9 +731,41 @@ TRAINING_MODULES = [
         'name': 'Phishing 101: How to Spot a Scam',
         'category': 'phishing',
         'duration_minutes': 8,
-        'video_url': 'https://example.com/videos/phishing-101.mp4',
+        'content': '''
+        <h2>What Is Phishing?</h2>
+        <p>Phishing is a type of social engineering attack where an attacker pretends to be someone you trust — a colleague, bank, vendor, or service you use — to trick you into giving up sensitive information or clicking something dangerous.</p>
+
+        <h2>How Phishing Works</h2>
+        <p>Attackers cast a wide net. They send thousands of emails hoping a small percentage will bite. The math is simple: send 10,000 emails, even a 1% success rate means 100 compromised accounts.</p>
+
+        <h2>Red Flags to Watch For</h2>
+        <ul>
+        <li><strong>Urgent or threatening language</strong> — "Your account will be suspended!" "Act now!"</li>
+        <li><strong>Mismatched sender addresses</strong> — Looks like amazon.com but the actual domain is amaz0n-support.com</li>
+        <li><strong>Generic greetings</strong> — "Dear Customer" instead of your actual name</li>
+        <li><strong>Spelling and grammar errors</strong> — Legitimate companies proofread their emails</li>
+        <li><strong>Unexpected attachments</strong> — Especially .zip, .exe, .docm, or .xlsx files</li>
+        <li><strong>Links that don't match</strong> — Hover over a link before clicking — does the URL match what it claims to be?</li>
+        <li><strong>Requests for credentials or personal info</strong> — Real companies don't ask for passwords via email</li>
+        </ul>
+
+        <h2>Real-World Example</h2>
+        <p>You receive an email that looks like it's from Netflix: "We couldn't process your payment. Click here to update your billing info." The link goes to a page that looks exactly like Netflix's login screen, but the URL is netflix-billing-support.com. When you "log in," you're actually giving your credentials to attackers.</p>
+
+        <h2>What To Do</h2>
+        <ul>
+        <li><strong>Don't click links</strong> in suspicious emails. Instead, go directly to the company's website by typing the address.</li>
+        <li><strong>When in doubt, verify.</strong> Call the sender using a number you know is real — not one from the email.</li>
+        <li><strong>Report it.</strong> Use your company's "Report Phishing" button. This helps your security team catch attacks faster.</li>
+        <li><strong>Delete it.</strong> After reporting, delete the email. Don't reply, don't forward (unless your security team asks), just delete.</li>
+        </ul>
+        ''',
         'quiz': [
-            {'q': 'Which is a sign of a phishing email?', 'options': ['Sender matches company domain', 'Urgent action required with a link', 'No grammatical errors'], 'answer': 1},
+            {'q': 'You receive an email from "support@paypa1.com" (note the numeral 1) saying your account has been compromised. What should you do?', 'options': ['Click the link immediately to secure your account', 'Reply to the email asking for more information', 'Delete the email and go directly to paypal.com by typing it in your browser', 'Forward it to your colleagues so they can be warned'], 'answer': 2},
+            {'q': 'An email claims your CEO needs an urgent wire transfer and asks you to keep it confidential. What is this most likely?', 'options': ['A legitimate urgent request from leadership', 'A social engineering attack called Business Email Compromise (BEC)', 'A glitch in the company email system', 'Nothing suspicious — CEOs often need urgent favors'], 'answer': 1},
+            {'q': 'Which of these is the STRONGEST reason to suspect an email is a phishing attempt?', 'options': ['It was sent early in the morning', 'It contains a link and asks you to log in with your credentials', 'The subject line is in all caps', 'The email has an attachment you weren\'t expecting'], 'answer': 1},
+            {'q': 'You hover over a link in an email and the URL shows "https://appleid.apple.com.secure-login.net/" — what does this tell you?', 'options': ['The link is safe because it mentions appleid.apple.com', 'The link is a phishing attempt — the real domain is secure-login.net, not apple.com', 'The link is encrypted and therefore safe', 'It means the email was sent by Apple officially'], 'answer': 1},
+            {'q': 'What is the correct response to a suspicious email that might be a phishing attempt?', 'options': ['Click the unsubscribe link at the bottom to stop receiving them', 'Reply with "STOP" to be removed from the list', 'Report it using your company\'s phishing report tool, then delete it', 'Open it in your second monitor to investigate more safely'], 'answer': 2},
         ]
     },
     {
@@ -741,9 +773,40 @@ TRAINING_MODULES = [
         'name': 'Password Security: Best Practices',
         'category': 'passwords',
         'duration_minutes': 6,
-        'video_url': 'https://example.com/videos/password-hygiene.mp4',
+        'content': '''
+        <h2>Why Passwords Matter</h2>
+        <p>Your password is the key to your digital life. One compromised password can lead to identity theft, financial fraud, corporate data breaches, and malware deployment across an entire organization.</p>
+
+        <h2>The Problem With Common Passwords</h2>
+        <p>The most common passwords include "123456," "password," and "qwerty." Attackers know this. They use automated tools that try these combinations in seconds. Strong passwords are the simplest, cheapest security control that exists — but most people still get it wrong.</p>
+
+        <h2>What Makes a Strong Password?</h2>
+        <ul>
+        <li><strong>Length over complexity</strong> — 16+ characters beats 8 characters with symbols. "correct-horse-battery-staple" is stronger than "Tr0ub4dor&3."</li>
+        <li><strong>Unique for every account</strong> — If one password leaks, everything else stays safe.</li>
+        <li><strong>No personal information</strong> — No birthdays, pet names, spouse names, or favorite sports teams.</li>
+        <li><strong>No dictionary words alone</strong> — "sunshine" or "football" can be cracked in milliseconds.</li>
+        </ul>
+
+        <h2>Use a Password Manager</h2>
+        <p>You cannot remember unique, complex passwords for every account. That's normal. Use a password manager (1Password, Bitwarden, KeePass) to generate and store strong, unique passwords for every service. You only need to remember one master password.</p>
+
+        <h2>Enable Two-Factor Authentication (2FA)</h2>
+        <p>Password alone is not enough. Enable 2FA everywhere it's offered — especially for email, banking, and work accounts. Use an authenticator app (Google Authenticator, Authy) or hardware key (YubiKey). <strong>Never use SMS-based 2FA</strong> — SIM-swapping attacks can bypass it.</p>
+
+        <h2>Other Critical Rules</h2>
+        <ul>
+        <li><strong>Never share passwords</strong> — Not with IT support, not with your boss, not with anyone. Real IT will never ask for your password.</li>
+        <li><strong>Never use work email for personal accounts</strong> — If that personal account gets breached, attackers now have a correlation to your employer.</li>
+        <li><strong>Change passwords immediately</strong> if you suspect any account may be compromised.</li>
+        </ul>
+        ''',
         'quiz': [
-            {'q': 'Best password practice?', 'options': ['Use the same password everywhere', 'Use a password manager + unique passwords', 'Write passwords on sticky notes'], 'answer': 1},
+            {'q': 'Which password is the STRONGEST?', 'options': ['Password123!', 'MyDogMax2015', 'correct-horse-battery-staple-36', 'Summer2024!'], 'answer': 2},
+            {'q': 'An IT support technician calls and asks you to read them your password so they can "fix a system issue." What should you do?', 'options': ['Read it to them — they\'re from IT and need to help', 'Ask for their employee ID and call the IT department back using the official number', 'Write it down and hand it to them', 'Send it via email so there\'s a record'], 'answer': 1},
+            {'q': 'Your favorite website offers 2FA. Which method should you choose?', 'options': ['SMS text message — it\'s the most convenient', 'Email code — it\'s the fastest', 'Authenticator app or hardware security key', 'No 2FA — passwords are enough'], 'answer': 2},
+            {'q': 'Why is using the same password across multiple accounts dangerous?', 'options': ['It\'s not dangerous — it\'s actually more secure', 'It means you only have to remember one password', 'If one account is breached, all accounts using that password are immediately compromised', 'It can slow down your computer'], 'answer': 2},
+            {'q': 'A password manager stores all your passwords in one place. Why is this considered secure?', 'options': ['It\'s not secure — you should never use one', 'Because it uses a single master password that you must remember, keeping all other passwords unique and complex', 'Because password managers are never targeted by attackers', 'Because it automatically shares your passwords with your company\'s IT team'], 'answer': 1},
         ]
     },
     {
@@ -751,9 +814,41 @@ TRAINING_MODULES = [
         'name': 'Social Engineering: The Human Firewall',
         'category': 'social_engineering',
         'duration_minutes': 10,
-        'video_url': 'https://example.com/videos/social-engineering.mp4',
+        'content': '''
+        <h2>What Is Social Engineering?</h2>
+        <p>Social engineering is the art of manipulating people into giving up information or taking actions that benefit an attacker. It's often easier for attackers to trick a human than to hack a system. People want to be helpful, avoid conflict, and trust authority — attackers exploit all of these.</p>
+
+        <h2>Common Social Engineering Tactics</h2>
+        <h3>Pretexting</h3>
+        <p>Attackers create a fabricated scenario to engage you. They might call pretending to be IT support, or email pretending to be your CFO needing an urgent favor. The story is the weapon.</p>
+
+        <h3>Baiting</h3>
+        <p>Attackers offer something enticing to spark curiosity. A USB drive labeled "Q4 Salary Report" left in a parking lot. A free USB charger cable mailed to an employee. People plug in unknown devices — and malware executes automatically.</p>
+
+        <h3>Tailgating</h3>
+        <p>An attacker follows an employee through a secure door by pretending to have forgotten their badge. Once inside, they have physical access to systems, ports, and documents.</p>
+
+        <h3>Quid Pro Quo</h3>
+        <p>Attackers offer a service or benefit in exchange for information. "Hi, we're calling from IT support — we noticed your computer might be running slow. Can we remote in to take a look?"</p>
+
+        <h2>How to Defend Yourself</h2>
+        <ul>
+        <li><strong>Verify before trusting</strong> — If someone claims to be from a company or your IT team, call them back through an official channel you know is real.</li>
+        <li><strong>Slow down</strong> — Urgency is a weapon. "Act now!" is designed to bypass your rational thinking. Take a breath. Ask yourself: is this actually urgent?</li>
+        <li><strong>Question authority</strong> — Attackers often impersonate executives, IT staff, or help desk. Legitimate requests from real people won't be offended if you verify properly.</li>
+        <li><strong>Don't be pushed</strong> — If someone is rushing you or threatening consequences for not complying, that is a massive red flag.</li>
+        <li><strong>Protect your physical space</strong> — Don't let strangers follow you through secure doors. Challenge unknown individuals politely: "Can I help you find someone?"</li>
+        </ul>
+
+        <h2>Real Scenario</h2>
+        <p>An attacker calls the main reception of a company, pretending to be a new hire who is locked out. The receptionist checks the employee directory, finds the name, and lets them in. The attacker now has physical access to the building, can plug in a keystroke logger, or access unattended computers.</p>
+        ''',
         'quiz': [
-            {'q': 'What should you do if your CEO asks for an urgent wire transfer via email?', 'options': ['Do it immediately', 'Verify via phone/Slack first', 'Ignore it'], 'answer': 1},
+            {'q': 'You receive a call from someone claiming to be from your company\'s IT department who says they need remote access to "fix a security issue on your machine." What should you do?', 'options': ['Give them access — IT issues are urgent and they\'re trying to protect you', 'Ask for their name and employee ID, then call the IT help desk back using the official number from your company\'s intranet', 'Let them in but watch what they do on your screen', 'Email them your credentials so they can fix it asynchronously'], 'answer': 1},
+            {'q': 'You find a USB drive in the parking lot labeled "Confidential — HR Performance Reviews 2024." What should you do?', 'options': ['Plug it into your work computer to find the owner', 'Take it to IT and let them handle it — don\'t plug it in yourself', 'Post a note in the break room asking if anyone lost a USB drive', 'Plug it into your personal computer at home to check its contents'], 'answer': 1},
+            {'q': 'An attacker calls and pretends to be your company\'s CFO, urgently requesting a wire transfer. The call seems legitimate — they know your name and have details about the company. What\'s the right move?', 'options': ['Do the transfer quickly — the CFO is always right', 'Hang up and call the CFO directly using the number in the company directory, not the one provided by the caller', 'Email the CFO to confirm the transfer before doing it', 'Ask the caller to verify by giving you their employee ID'], 'answer': 1},
+            {'q': 'What makes social engineering particularly dangerous compared to technical attacks?', 'options': ['It targets human psychology rather than software vulnerabilities, exploiting trust and helpfulness', 'It\'s faster to execute than technical attacks', 'It requires no prior knowledge of the target', 'Technical attacks are always more dangerous'], 'answer': 0},
+            {'q': 'A vendor you\'ve worked with before sends an email asking you to update your payment routing information to a new bank account. They reference a recent project and use the same email signature as always. What should you do?', 'options': ['Update it immediately — they\'re a trusted vendor and it\'s probably urgent', 'Call the vendor using a known phone number (not one from the email) to verify the request before changing anything', 'Reply to the email asking if the change is real', 'Send them your current bank info so they can confirm it\'s the same'], 'answer': 1},
         ]
     },
 ]
@@ -805,32 +900,191 @@ def list_assignments():
 def training_page(assignment_id):
     assignment = _store['training_assignments'].get(assignment_id)
     if not assignment:
-        return "Assignment not found", 404
+        return "<html><body style='font-family:Arial;background:#070d17;color:#ddeeff;padding:40px'><h2>Assignment not found.</h2><p>This training link may have already been completed or is invalid.</p></body></html>", 404
     module = next((m for m in TRAINING_MODULES if m['id'] == assignment['module_id']), None)
     if not module:
-        return "Module not found", 404
-    return f"""
-    <html><head><title>{module['name']}</title></head>
-    <body>
-    <h1>{module['name']}</h1>
-    <p>Video would play here: {module['video_url']}</p>
-    <p>Quiz would appear here (not yet interactive).</p>
-    <p>Duration: {module['duration_minutes']} minutes</p>
-    <form method="POST" action="/training/{assignment_id}/complete">
-    <button type="submit">Mark Complete</button>
-    </form>
-    </body></html>
-    """
+        return "<html><body style='font-family:Arial;background:#070d17;color:#ddeeff;padding:40px'><h2>Module not found.</h2></body></html>", 404
+    if assignment.get('completed_at'):
+        cert_link = f"<a href='/training/{assignment_id}/certificate' style='background:#4da8ff;color:#071018;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:16px;'>📜 Download Certificate</a>"
+        return f"""<html><head><title>Completed: {module['name']}</title><style>
+        body{{font-family:'Segoe UI',Arial,sans-serif;background:#070d17;color:#ddeeff;padding:40px;text-align:center;}}
+        .card{{max-width:600px;margin:60px auto;background:#0d1a2e;border:1px solid #1a3050;border-radius:12px;padding:40px;}}
+        h1{{color:#4da8ff;}}p{{color:#8ab0cc;}}
+        </style></head><body>
+        <div class=card>
+        <h1>✅ Module Complete!</h1>
+        <h2 style='color:#fff'>{module['name']}</h2>
+        <p>You have successfully completed this training module.</p>
+        {cert_link}
+        </div></body></html>"""
+    # Build quiz options HTML
+    quiz_html = ''
+    for i, q in enumerate(module['quiz']):
+        opts_html = ''
+        for j, opt in enumerate(q['options']):
+            opts_html += f"""<label style='display:block;padding:10px 14px;margin:6px 0;background:#0d2847;border:1px solid #1a4a7a;border-radius:7px;cursor:pointer;'>
+            <input type='radio' name='q{i}' value='{j}' style='margin-right:8px'> {opt}
+            </label>"""
+        quiz_html += f"""<div style='margin-bottom:24px;'><p style='font-weight:700;margin-bottom:8px;'>{i+1}. {q['q']}</p>{opts_html}</div>"""
+    return f"""<html><head><title>{module['name']}</title><style>
+    body{{font-family:'Segoe UI',Arial,sans-serif;background:#070d17;color:#ddeeff;margin:0;}}
+    .topbar{{background:#0d1a2e;border-bottom:1px solid #1a3050;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}}
+    .topbar h1{{font-size:1.1rem;color:#4da8ff;margin:0;}}
+    .badge{{background:#0d2847;color:#4da8ff;font-size:0.75rem;padding:4px 10px;border-radius:12px;border:1px solid #1a4a7a;}}
+    .container{{max-width:800px;margin:0 auto;padding:32px 24px;}}
+    .module-content{{background:#0d1a2e;border:1px solid #1a3050;border-radius:12px;padding:32px;margin-bottom:32px;}}
+    .module-content h2{{color:#4da8ff;font-size:1.3rem;margin-top:24px;margin-bottom:12px;}}
+    .module-content h2:first-child{{margin-top:0;}}
+    .module-content h3{{color:#ddeeff;font-size:1.05rem;margin-top:20px;margin-bottom:8px;}}
+    .module-content p{{color:#b0c4d8;line-height:1.7;margin:8px 0;}}
+    .module-content ul{{color:#b0c4d8;line-height:1.9;padding-left:20px;}}
+    .module-content li{{margin:6px 0;}}
+    .module-content li strong{{color:#ddeeff;}}
+    .module-content strong{{color:#ddeeff;}}
+    .quiz-section{{background:#0d1a2e;border:1px solid #1a3050;border-radius:12px;padding:32px;}}
+    .quiz-section h2{{color:#4da8ff;font-size:1.3rem;margin-bottom:20px;}}
+    label:hover{{background:#1a4a7a;}}
+    .submit-btn{{background:#4da8ff;color:#071018;padding:14px 32px;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:16px;}}
+    .submit-btn:hover{{background:#79bfff;}}
+    #result{{margin-top:20px;padding:20px;border-radius:8px;font-weight:700;display:none;}}
+    .pass{{background:#0a3a1a;border:2px solid #22c55e;color:#22c55e;}}
+    .fail{{background:#3a0a0a;border:2px solid #ef4444;color:#ef4444;}}
+    </style></head><body>
+    <div class=topbar>
+        <h1>🎓 EdgeIQ Security Training</h1>
+        <span class=badge>{module['name']}</span>
+    </div>
+    <div class=container>
+        <div class=module-content>
+            {module['content']}
+        </div>
+        <div class=quiz-section>
+            <h2>📝 Module Quiz — {len(module['quiz'])} Questions</h2>
+            <p style='color:#6a8aaa;margin-bottom:20px;'>Answer all questions correctly to pass. You can retake if you don't pass on the first try.</p>
+            <form id=quizForm onsubmit='return handleSubmit(event)'>
+                {quiz_html}
+                <button type='submit' class=submit-btn>Submit Answers</button>
+            </form>
+            <div id=result></div>
+        </div>
+    </div>
+    <script>
+    const answers = {str({i: q['answer'] for i, q in enumerate(module['quiz'])})[1:-1]};
+    function handleSubmit(e) {{
+        e.preventDefault();
+        let score = 0;
+        let total = Object.keys(answers).length;
+        for (let i = 0; i < total; i++) {{
+            const sel = document.querySelector(`input[name="q${{i}}"]:checked`);
+            if (sel && parseInt(sel.value) === answers[i]) score++;
+        }}
+        const pct = Math.round((score / total) * 100);
+        const resultDiv = document.getElementById('result');
+        if (pct >= 80) {{
+            resultDiv.className = 'pass';
+            resultDiv.innerHTML = `🎉 Passed! You scored ${{score}}/${{total}} (${{pct}}%). Submitting your results...`;
+            resultDiv.style.display = 'block';
+            // Auto-submit
+            fetch(`/training/{assignment_id}/complete`, {{
+                method: 'POST',
+                headers: {{'Content-Type': 'application/json'}},
+                body: JSON.stringify({{score: score, total: total, pct: pct}})
+            }}).then(r => r.json()).then(d => {{
+                if (d.redirect) window.location.href = d.redirect;
+            }}).catch(() => {{
+                // fallback: submit form normally
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/training/{assignment_id}/complete';
+                document.body.appendChild(form);
+                form.submit();
+            }});
+        }} else {{
+            resultDiv.className = 'fail';
+            resultDiv.innerHTML = `❌ Not quite — ${{score}}/${{total}} (${{pct}}%). You need 80% to pass. Review the material above and try again.`;
+            resultDiv.style.display = 'block';
+        }}
+        return false;
+    }}
+    </script>
+    </body></html>"""
 
 @app.route('/training/<assignment_id>/complete', methods=['POST'])
 def complete_training(assignment_id):
     assignment = _store['training_assignments'].get(assignment_id)
     if not assignment:
-        return "Assignment not found", 404
+        return jsonify({'error': 'Assignment not found'}), 404
+    if assignment.get('completed_at'):
+        return jsonify({'redirect': f'/training/{assignment_id}/certificate'})
+    # Try to read JSON score from body
+    import json as _json
+    data = None
+    try:
+        data = _json.loads(request.data)
+    except Exception:
+        pass
+    score_data = {}
+    if data:
+        score_data = {'quiz_score': data.get('score'), 'quiz_total': data.get('total'), 'quiz_pct': data.get('pct')}
     assignment['completed_at'] = _now()
     assignment['status'] = 'completed'
+    assignment.update(score_data)
     _persist_store()
-    return f"<html><body><h1>Training Complete!</h1><p>You have successfully completed {assignment['module_name']}.</p></body></html>"
+    return jsonify({'redirect': f'/training/{assignment_id}/certificate', 'status': 'completed'})
+
+
+@app.route('/training/<assignment_id>/certificate', methods=['GET'])
+def training_certificate(assignment_id):
+    assignment = _store['training_assignments'].get(assignment_id)
+    if not assignment:
+        return "Certificate not found.", 404
+    if assignment.get('status') != 'completed':
+        return "<html><body style='font-family:Arial;background:#070d17;color:#ddeeff;padding:40px;text-align:center;'><h2>Certificate not available yet.</h2><p>Complete the training module and quiz first.</p><a href='/training/{}' style='color:#4da8ff;'>Go to Training</a></body></html>".format(assignment_id), 400
+    module = next((m for m in TRAINING_MODULES if m['id'] == assignment['module_id']), None)
+    from datetime import datetime
+    completed = assignment.get('completed_at', _now())
+    score = assignment.get('quiz_score', 'N/A')
+    total = assignment.get('quiz_total', 'N/A')
+    pct = assignment.get('quiz_pct', 'N/A')
+    cert_id = assignment_id[:12].upper()
+    return f"""<!DOCTYPE html>
+    <html><head><title>Training Certificate</title><style>
+    body{{font-family:'Georgia',serif;background:#070d17;color:#ddeeff;margin:0;padding:0;}}
+    .cert{{max-width:800px;margin:60px auto;background:#fff;color:#1a1a1a;border:3px solid #4da8ff;border-radius:16px;padding:60px;text-align:center;position:relative;}}
+    .cert::before{{content:'';position:absolute;top:12px;left:12px;right:12px;bottom:12px;border:1px solid #4da8ff;border-radius:10px;pointer-events:none;}}
+    .corner{{position:absolute;width:40px;height:40px;}}
+    .tl{{top:20px;left:20px;border-top:3px solid #4da8ff;border-left:3px solid #4da8ff;}}
+    .tr{{top:20px;right:20px;border-top:3px solid #4da8ff;border-right:3px solid #4da8ff;}}
+    .bl{{bottom:20px;left:20px;border-bottom:3px solid #4da8ff;border-left:3px solid #4da8ff;}}
+    .br{{bottom:20px;right:20px;border-bottom:3px solid #4da8ff;border-right:3px solid #4da8ff;}}
+    h1{{font-size:2rem;color:#4da8ff;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}}
+    .sub{{font-size:1rem;color:#555;letter-spacing:0.05em;margin-bottom:40px;}}
+    .recipient{{font-size:2.5rem;font-weight:bold;color:#1a1a1a;margin:20px 0;font-family:'Segoe UI',Arial,sans-serif;}}
+    .module{{font-size:1.1rem;color:#333;margin:20px 0;}}
+    .score{{font-size:0.9rem;color:#666;margin-bottom:30px;}}
+    .meta{{font-size:0.82rem;color:#888;border-top:1px solid #ddd;padding-top:20px;margin-top:40px;}}
+    .seal{{position:absolute;bottom:40px;right:60px;width:80px;height:80px;background:#4da8ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:0.7rem;text-align:center;line-height:1.2;}}
+    .company{{font-size:1.5rem;font-weight:bold;color:#1a1a1a;margin-bottom:4px;}}
+    .tagline{{font-size:0.85rem;color:#666;margin-bottom:30px;}}
+    </style></head><body>
+    <div class=cert>
+        <div class='corner tl'></div><div class='corner tr'></div><div class='corner bl'></div><div class='corner br'></div>
+        <h1>Certificate of Completion</h1>
+        <div class=sub>Security Awareness Training</div>
+        <div class=company>EdgeIQ PhishSim</div>
+        <div class=tagline>Human Layer Security Platform</div>
+        <p style='font-size:0.9rem;color:#555;'>This certifies successful completion of</p>
+        <div class=recipient>{module['name'] if module else assignment.get('module_name', 'Security Training Module')}</div>
+        <div class=module>Duration: {module['duration_minutes'] if module else '?'} minutes &nbsp;|&nbsp; Category: {module['category'].replace('_',' ').title() if module else 'General'}</div>
+        <div class=score>Quiz Score: {score}/{total} ({pct}% — Passed @ 80% threshold)</div>
+        <div class=meta>
+            Certificate ID: {cert_id}<br>
+            Completed: {completed}<br>
+            EdgeIQ PhishSim — edgeiq-phishsim.onrender.com
+        </div>
+        <div class=seal>EdgeIQ<br>Certified</div>
+    </div>
+    </body></html>"""
 
 # ─── Reporting ──────────────────────────────────────────────────────────
 
