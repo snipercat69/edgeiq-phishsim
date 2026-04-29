@@ -118,7 +118,44 @@ def cors(response):
 
 # ─── Health ────────────────────────────────────────────────────────────────
 
-@app.route('/health', methods=['GET'])
+
+# ─── SMTP Debug ─────────────────────────────────────────────────────────────
+@app.route('/api/debug/smtp-test', methods=['POST'])
+def smtp_debug_test():
+    """Direct SMTP connectivity test."""
+    import smtplib, ssl, socket
+    result = {
+        'smtp_host': SMTP_HOST,
+        'smtp_port': SMTP_PORT,
+        'sending_domain': SENDING_DOMAIN,
+        'smtp_user_set': bool(SMTP_USER),
+        'smtp_pass_set': bool(SMTP_PASS),
+        'connect_ok': None,
+        'connect_error': None,
+        'tls_ok': None,
+        'login_ok': None,
+        'login_error': None,
+    }
+    try:
+        context = ssl.create_default_context()
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+            result['connect_ok'] = True
+            try:
+                server.starttls(context=context, timeout=10)
+                result['tls_ok'] = True
+            except Exception as e:
+                result['tls_ok'] = str(e)
+            try:
+                server.login(SMTP_USER, SMTP_PASS, timeout=10)
+                result['login_ok'] = True
+            except Exception as e:
+                result['login_error'] = str(e)
+    except Exception as e:
+        result['connect_ok'] = False
+        result['connect_error'] = str(e)
+    return jsonify(result)
+
+\n@app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'service': 'edgeiq-phishsim', 'version': '1.0.0'})
 
