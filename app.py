@@ -10,7 +10,7 @@ Handles:
 - Credential capture landing pages
 - Training assignment dispatch
 """
-import os, json, uuid, smtplib, ssl, requests as http_requests
+import os, json, uuid, smtplib, ssl, tempfile, threading
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -28,21 +28,59 @@ SMTP_PORT    = int(os.environ.get('SMTP_PORT', 587))
 SMTP_USER    = os.environ.get('SMTP_USER', '')
 SMTP_PASS    = os.environ.get('SMTP_PASS', '')
 SENDING_DOMAIN = os.environ.get('SENDING_DOMAIN', 'simulate.edgeiqlabs.com')
-MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', '')
-MAILGUN_API_URL = f'https://api.mailgun.net/v3/{SENDING_DOMAIN}/messages'
-FROM_NAME    = os.environ.get('FROM_NAME', 'EdgeIQ Security')
 FROM_NAME    = os.environ.get('FROM_NAME', 'EdgeIQ Security')
 APP_URL      = os.environ.get('APP_URL', 'https://simulate.edgeiqlabs.com')
+STORE_PATH   = os.environ.get('STORE_PATH', '/tmp/edgeiq-phishsim-store.json')
 
 # In-memory store (MVP — replace with PostgreSQL for production)
 # Format: { campaign_id: { ... }, target_id: { ... }, ... }
-_store = {
-    "campaigns": {},
-    "targets": {},
-    "templates": {},
-    "campaign_sends": {},
-    "training_assignments": {},
-}
+def _default_store():
+    return {
+        "campaigns": {},
+        "targets": {},
+        "templates": {},
+        "campaign_sends": {},
+        "training_assignments": {},
+    }
+
+_store = _default_store()
+_store_lock = threading.Lock()
+
+def _load_store():
+    """Load persisted store from disk if available."""
+    global _store
+    if not STORE_PATH:
+        return
+    try:
+        if os.path.exists(STORE_PATH):
+            with open(STORE_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            base = _default_store()
+            if isinstance(data, dict):
+                for k in base.keys():
+                    v = data.get(k, {})
+                    base[k] = v if isinstance(v, dict) else {}
+            _store = base
+            print(f"[PERSIST] store loaded from {STORE_PATH}")
+    except Exception as e:
+        print(f"[PERSIST][WARN] failed to load store: {type(e).__name__}: {e}")
+
+def _persist_store():
+    """Persist store atomically to disk."""
+    if not STORE_PATH:
+        return
+    try:
+        os.makedirs(os.path.dirname(STORE_PATH) or '.', exist_ok=True)
+        fd, tmp = tempfile.mkstemp(prefix='edgeiq-store-', suffix='.json', dir=os.path.dirname(STORE_PATH) or '.')
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            json.dump(_store, f)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, STORE_PATH)
+    except Exception as e:
+        print(f"[PERSIST][WARN] failed to persist store: {type(e).__name__}: {e}")
+
+_load_store()
 
 # ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -53,11 +91,16 @@ def _now():
     return datetime.utcnow().isoformat()
 
 def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
-    """Send email via Mailgun HTTP API. Returns (success, error_detail)."""
-    if not MAILGUN_API_KEY:
-        detail = 'MAILGUN_API_KEY missing'
-        print(f"[DEBUG] Mailgun not configured — would send to {to_email}: {subject} | {detail}")
+    """Send email via SMTP. Returns (success, error_detail)."""
+    if not SMTP_USER or not SMTP_PASS:
+        detail = 'SMTP_USER or SMTP_PASS missing'
+        print(f"[DEBUG] SMTP not configured — would send to {to_email}: {subject} | {detail}")
         return True, detail
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>"
+    msg['To'] = to_email
 
     # Add tracking pixel
     if tracking_pixel_id:
@@ -65,28 +108,25 @@ def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
         pixel_html = f'<img src="{pixel_url}" width="1" height="1" style="display:none" />'
         html_body = pixel_html + html_body
 
+    html_part = MIMEText(html_body, 'html')
+    msg.attach(html_part)
+
     try:
-        resp = http_requests.post(
-            MAILGUN_API_URL,
-            auth=('api', MAILGUN_API_KEY),
-            data={
-                'from': f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>",
-                'to': to_email,
-                'subject': subject,
-                'html': html_body,
-            },
-            timeout=15,
+        print(
+            f"[DEBUG] SMTP attempt host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} "
+            f"from=noreply@{SENDING_DOMAIN} to={to_email}"
         )
-        if resp.status_code in (200, 201):
-            print(f"[DEBUG] Mailgun send OK to {to_email}: {resp.status_code}")
-            return True, None
-        else:
-            detail = f"status={resp.status_code} {resp.text[:200]}"
-            print(f"[ERROR] Mailgun send failed: {detail}")
-            return False, detail
+        context = ssl.create_default_context()
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+            server.set_debuglevel(1)
+            server.starttls(context=context)
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(f"noreply@{SENDING_DOMAIN}", to_email, msg.as_string())
+        print(f"[DEBUG] SMTP send succeeded to {to_email}")
+        return True, None
     except Exception as e:
         detail = f"{type(e).__name__}: {e}"
-        print(f"[ERROR] Mailgun send exception: {detail}")
+        print(f"[ERROR] SMTP send failed host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} detail={detail}")
         return False, detail
 
 def _render_template(template_html, template_vars):
@@ -119,43 +159,6 @@ def cors(response):
 
 # ─── Health ────────────────────────────────────────────────────────────────
 
-
-# ─── SMTP Debug ─────────────────────────────────────────────────────────────
-@app.route('/api/debug/smtp-test', methods=['POST'])
-def smtp_debug_test():
-    """Direct SMTP connectivity test."""
-    import smtplib, ssl, socket
-    result = {
-        'smtp_host': SMTP_HOST,
-        'smtp_port': SMTP_PORT,
-        'sending_domain': SENDING_DOMAIN,
-        'smtp_user_set': bool(SMTP_USER),
-        'smtp_pass_set': bool(SMTP_PASS),
-        'connect_ok': None,
-        'connect_error': None,
-        'tls_ok': None,
-        'login_ok': None,
-        'login_error': None,
-    }
-    try:
-        context = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
-            result['connect_ok'] = True
-            try:
-                server.starttls(context=context, timeout=10)
-                result['tls_ok'] = True
-            except Exception as e:
-                result['tls_ok'] = str(e)
-            try:
-                server.login(SMTP_USER, SMTP_PASS, timeout=10)
-                result['login_ok'] = True
-            except Exception as e:
-                result['login_error'] = str(e)
-    except Exception as e:
-        result['connect_ok'] = False
-        result['connect_error'] = str(e)
-    return jsonify(result)
-
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'service': 'edgeiq-phishsim', 'version': '1.0.0'})
@@ -184,6 +187,7 @@ def create_template():
         'created_at': _now(),
     }
     _store['templates'][tid] = template
+    _persist_store()
     return jsonify(template), 201
 
 @app.route('/api/templates/<tid>', methods=['GET'])
@@ -210,6 +214,7 @@ def landing_page(template_id, tracking_id):
         if send.get('tracking_id') == tracking_id:
             if not send.get('clicked_at'):
                 send['clicked_at'] = _now()
+                _persist_store()
             break
 
     resp = make_response(lp_html)
@@ -243,6 +248,7 @@ def capture_credentials():
 
     # Trigger training assignment (async in production — for MVP just mark it)
     _assign_training(send_record)
+    _persist_store()
 
     # Return "success" — the fake login "worked"
     return jsonify({
@@ -272,6 +278,7 @@ def create_campaign():
         'created_at': _now(),
     }
     _store['campaigns'][cid] = campaign
+    _persist_store()
     return jsonify(campaign), 201
 
 @app.route('/api/campaigns/<cid>', methods=['GET'])
@@ -352,6 +359,8 @@ def launch_campaign(cid):
     if sent > 0:
         campaign['status'] = 'running'
 
+    _persist_store()
+
     failed_details = [
         {
             'target_id': s.get('target_id'),
@@ -376,6 +385,7 @@ def abort_campaign(cid):
     if not campaign:
         return jsonify({'error': 'Campaign not found'}), 404
     campaign['status'] = 'aborted'
+    _persist_store()
     return jsonify({'campaign_id': cid, 'status': 'aborted'})
 
 # ─── Target Management ────────────────────────────────────────────────────
@@ -408,6 +418,7 @@ def create_target():
     if not target['email']:
         return jsonify({'error': 'email is required'}), 400
     _store['targets'][tid] = target
+    _persist_store()
     return jsonify(target), 201
 
 @app.route('/api/targets/bulk', methods=['POST'])
@@ -439,6 +450,8 @@ def bulk_import_targets():
         _store['targets'][tid] = target
         created.append(target)
 
+    _persist_store()
+
     return jsonify({'created': len(created), 'errors': errors, 'targets': created}), 201
 
 # ─── Tracking ─────────────────────────────────────────────────────────────
@@ -449,6 +462,7 @@ def track_open(tracking_id):
     for send in _store['campaign_sends'].values():
         if send.get('tracking_id') == tracking_id and not send.get('opened_at'):
             send['opened_at'] = _now()
+            _persist_store()
             break
 
     # Return 1x1 transparent GIF
@@ -513,6 +527,7 @@ def _assign_training(send_record):
         'status': 'assigned',  # assigned, completed
     }
     _store['training_assignments'][assignment['id']] = assignment
+    _persist_store()
 
     # Send training email to target
     target = _store['targets'].get(send_record['target_id'])
@@ -568,6 +583,7 @@ def complete_training(assignment_id):
         return "Assignment not found", 404
     assignment['completed_at'] = _now()
     assignment['status'] = 'completed'
+    _persist_store()
     return f"<html><body><h1>Training Complete!</h1><p>You have successfully completed {assignment['module_name']}.</p></body></html>"
 
 # ─── Reporting ──────────────────────────────────────────────────────────
@@ -692,7 +708,9 @@ def _init_templates():
         },
     ]
     for t in templates:
-        _store['templates'][t['id']] = {**t, 'created_at': _now()}
+        if t['id'] not in _store['templates']:
+            _store['templates'][t['id']] = {**t, 'created_at': _now()}
+    _persist_store()
 
 # ─── Built-in Landing Pages ──────────────────────────────────────────────
 
