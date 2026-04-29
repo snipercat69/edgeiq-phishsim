@@ -343,48 +343,86 @@ def home():
       <!-- PRICING -->
       <div class="section" id="pricing">
         <h2>Simple, Predictable Pricing</h2>
-        <p class="sub">No per-user surprise bills. One flat monthly rate per tier.</p>
+        <p class="sub">No per-user surprise bills. Switch between monthly and annual anytime.</p>
+
+        <div style="text-align:center;margin-bottom:20px;">
+          <span style="display:inline-block;background:#1a4a7a;color:#4da8ff;padding:6px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;letter-spacing:0.05em;">ANNUAL PLANS SAVE ~28% — 2 MONTHS FREE</span>
+        </div>
+
         <div class="pricing">
           <div class="plan">
             <div class="tag">Starter</div>
             <h3>PhishSim Starter</h3>
-            <div class="price">$29<span>/mo</span></div>
+            <div style="display:flex;gap:16px;align-items:center;margin:8px 0;">
+              <div>
+                <div class="price">$29<span>/mo</span></div>
+                <div style="font-size:0.78rem;color:#6a8aaa;">billed monthly</div>
+              </div>
+              <div style="border-left:1px solid #1a3050;padding-left:16px;">
+                <div class="price" style="font-size:1.5rem;">$249<span>/yr</span></div>
+                <div style="font-size:0.78rem;color:#22c55e;">save $99/yr</div>
+              </div>
+            </div>
             <ul>
               <li>Up to 25 users</li>
               <li>10 campaigns/month</li>
               <li>20 phishing templates</li>
+              <li>Phishing training module</li>
               <li>Basic campaign reports</li>
               <li>Email support</li>
             </ul>
-            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter">Start Free Trial</a>
+            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter" style="margin-top:8px;">Monthly — $29/mo</a>
+            <a href="https://buy.stripe.com/eVqbJ39i3bxr07G5os7wA1F" class="btn-block tier-starter" style="margin-top:4px;font-size:0.8rem;">Annual — $249/yr</a>
           </div>
           <div class="plan popular">
             <div class="tag">Most Popular</div>
             <h3>PhishSim Pro</h3>
-            <div class="price">$79<span>/mo</span></div>
+            <div style="display:flex;gap:16px;align-items:center;margin:8px 0;">
+              <div>
+                <div class="price">$79<span>/mo</span></div>
+                <div style="font-size:0.78rem;color:#6a8aaa;">billed monthly</div>
+              </div>
+              <div style="border-left:1px solid #1a3050;padding-left:16px;">
+                <div class="price" style="font-size:1.5rem;">$699<span>/yr</span></div>
+                <div style="font-size:0.78rem;color:#22c55e;">save $249/yr</div>
+              </div>
+            </div>
             <ul>
               <li>Up to 100 users</li>
               <li>Unlimited campaigns</li>
               <li>20 phishing templates</li>
+              <li>All 3 training modules</li>
               <li>Advanced analytics &amp; PDF reports</li>
               <li>Training auto-enrollment</li>
               <li>Priority email support</li>
             </ul>
-            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro">Start Free Trial</a>
+            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro" style="margin-top:8px;">Monthly — $79/mo</a>
+            <a href="https://buy.stripe.com/aFa9AV8dZ7hbcUs4ko7wA1G" class="btn-block tier-pro" style="margin-top:4px;font-size:0.8rem;">Annual — $699/yr</a>
           </div>
           <div class="plan">
             <div class="tag">Agency / MSP</div>
             <h3>PhishSim Agency</h3>
-            <div class="price">$149<span>/mo</span></div>
+            <div style="display:flex;gap:16px;align-items:center;margin:8px 0;">
+              <div>
+                <div class="price">$149<span>/mo</span></div>
+                <div style="font-size:0.78rem;color:#6a8aaa;">billed monthly</div>
+              </div>
+              <div style="border-left:1px solid #1a3050;padding-left:16px;">
+                <div class="price" style="font-size:1.5rem;">$1,299<span>/yr</span></div>
+                <div style="font-size:0.78rem;color:#22c55e;">save $489/yr</div>
+              </div>
+            </div>
             <ul>
               <li>Up to 500 users</li>
               <li>Unlimited campaigns</li>
               <li>20 phishing templates</li>
+              <li>All 3 training modules</li>
               <li>White-label reporting</li>
               <li>Multi-client portal</li>
               <li>Dedicated account manager</li>
             </ul>
-            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency">Start Free Trial</a>
+            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency" style="margin-top:8px;">Monthly — $149/mo</a>
+            <a href="https://buy.stripe.com/00w9AVeCnatn8Ec2cg7wA1H" class="btn-block tier-agency" style="margin-top:4px;font-size:0.8rem;">Annual — $1,299/yr</a>
           </div>
         </div>
       </div>
