@@ -193,6 +193,37 @@ def cors(response):
 def health():
     return jsonify({'status': 'ok', 'service': 'edgeiq-phishsim', 'version': '1.0.0'})
 
+@app.route('/', methods=['GET'])
+def home():
+    return f"""
+    <html>
+      <head>
+        <title>EdgeIQ PhishSim</title>
+        <style>
+          body {{ font-family: Arial, sans-serif; margin: 40px; background:#0b1220; color:#eaf2ff; }}
+          .card {{ max-width: 760px; border:1px solid #2a3a58; border-radius:12px; padding:24px; background:#101a2f; }}
+          a {{ color:#6cd7ff; }}
+          code {{ background:#0d1629; padding:2px 6px; border-radius:6px; }}
+          ul {{ line-height:1.7; }}
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h1>🎯 EdgeIQ PhishSim</h1>
+          <p>Live phishing simulation platform for SMB security awareness campaigns.</p>
+          <ul>
+            <li>Health check: <a href="/health" target="_blank">/health</a></li>
+            <li>Templates API: <code>/api/templates</code></li>
+            <li>Targets API: <code>/api/targets</code></li>
+            <li>Campaigns API: <code>/api/campaigns</code></li>
+            <li>Reports API: <code>/api/reports/campaign/&lt;campaign_id&gt;</code></li>
+          </ul>
+          <p><strong>Status:</strong> Online ✅</p>
+        </div>
+      </body>
+    </html>
+    """
+
 # ─── Template Management ──────────────────────────────────────────────────
 
 @app.route('/api/templates', methods=['GET'])
