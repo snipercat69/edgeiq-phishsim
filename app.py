@@ -522,6 +522,9 @@ def create_campaign():
         'scheduled_at': data.get('scheduled_at'),  # ISO timestamp or None
         'target_ids': data.get('target_ids', []),
         'created_at': _now(),
+        # Plan tier controls which training modules are available:
+        # starter = phishing only | pro/agency = all modules
+        'plan': data.get('plan', 'starter'),
     }
     _store['campaigns'][cid] = campaign
     _persist_store()
@@ -854,9 +857,18 @@ TRAINING_MODULES = [
 ]
 
 def _assign_training(send_record):
-    """Assign a random training module to a target who clicked/submitted."""
+    """Assign a training module based on plan tier and click type."""
     import random
-    module = random.choice(TRAINING_MODULES)
+    campaign = _store['campaigns'].get(send_record.get('campaign_id')) or {}
+    plan = campaign.get('plan', 'starter')
+    # Filter eligible modules by plan tier
+    if plan == 'starter':
+        eligible = [m for m in TRAINING_MODULES if m['category'] == 'phishing']
+    else:  # pro or agency — all modules available
+        eligible = TRAINING_MODULES
+    if not eligible:
+        return None
+    module = random.choice(eligible)
     assignment = {
         'id': _gen_id(),
         'send_id': send_record['id'],
@@ -888,13 +900,13 @@ def _assign_training(send_record):
 
     return assignment
 
-@app.route('/api/training/assignments', methods=['GET'])
-def list_assignments():
-    target_id = request.args.get('target_id')
-    assignments = list(_store['training_assignments'].values())
-    if target_id:
-        assignments = [a for a in assignments if a.get('target_id') == target_id]
-    return jsonify({'assignments': assignments})
+# @app.route('/api/training/assignments', methods=['GET'])
+# def list_assignments():  # superseded by api_list_assignments below
+#     target_id = request.args.get('target_id')
+#     assignments = list(_store['training_assignments'].values())
+#     if target_id:
+#         assignments = [a for a in assignments if a.get('target_id') == target_id]
+#     return jsonify({'assignments': assignments})
 
 @app.route('/training/<assignment_id>', methods=['GET'])
 def training_page(assignment_id):
@@ -1086,7 +1098,188 @@ def training_certificate(assignment_id):
     </div>
     </body></html>"""
 
-# ─── Reporting ──────────────────────────────────────────────────────────
+# ─── Training Compliance Dashboard ──────────────────────────────────────
+
+@app.route('/dashboard/training', methods=['GET'])
+def training_dashboard():
+    """Manager view: training compliance across all campaigns."""
+    campaigns = list(_store['campaigns'].values())
+    all_assignments = list(_store['training_assignments'].values())
+
+    # Per-campaign breakdown
+    campaign_rows = []
+    for c in reversed(campaigns[-10:]):  # last 10 campaigns
+        cid = c['id']
+        c_assignments = [a for a in all_assignments if a.get('campaign_id') == cid or a.get('send_id', '').startswith(cid)]
+        total = len(c_assignments)
+        completed = sum(1 for a in c_assignments if a.get('status') == 'completed')
+        pct = round(completed / total * 100, 1) if total > 0 else 0
+        campaign_rows.append({
+            'id': cid,
+            'name': c.get('name', 'Untitled'),
+            'plan': c.get('plan', 'starter'),
+            'status': c.get('status', 'draft'),
+            'total_assigned': total,
+            'completed': completed,
+            'pct': pct,
+        })
+
+    # Overall stats
+    total_assignments = len(all_assignments)
+    total_completed = sum(1 for a in all_assignments if a.get('status') == 'completed')
+    overall_pct = round(total_completed / total_assignments * 100, 1) if total_assignments > 0 else 0
+
+    # Per-user breakdown (all assignments, most recent first)
+    user_map = {}
+    for a in all_assignments:
+        tid = a.get('target_id', 'unknown')
+        if tid not in user_map:
+            target = _store['targets'].get(tid, {})
+            user_map[tid] = {'target_id': tid, 'name': target.get('first_name', '') + ' ' + target.get('last_name', ''), 'email': target.get('email', ''), 'assignments': []}
+        user_map[tid]['assignments'].append(a)
+
+    user_rows = []
+    for uid, udata in user_map.items():
+        total_u = len(udata['assignments'])
+        done_u = sum(1 for a in udata['assignments'] if a.get('status') == 'completed')
+        pct_u = round(done_u / total_u * 100, 1) if total_u > 0 else 0
+        scores = [a.get('quiz_score') for a in udata['assignments'] if a.get('quiz_score') is not None]
+        avg_score = round(sum(scores) / len(scores), 1) if scores else None
+        user_rows.append({
+            'name': udata['name'] or 'Unknown',
+            'email': udata['email'],
+            'total': total_u,
+            'completed': done_u,
+            'pct': pct_u,
+            'avg_score': avg_score,
+        })
+    user_rows.sort(key=lambda x: x['pct'])
+
+    # Build table HTML
+    def status_badge(pct):
+        if pct >= 80: return "<span style='background:#0a3a1a;color:#22c55e;padding:3px 8px;border-radius:10px;font-size:0.78rem;font-weight:700;'>✓ Complete</span>"
+        if pct > 0: return "<span style='background:#3a2a00;color:#f59e0b;padding:3px 8px;border-radius:10px;font-size:0.78rem;font-weight:700;'>⏳ In Progress</span>"
+        return "<span style='background:#1a1a2a;color:#6a8aaa;padding:3px 8px;border-radius:10px;font-size:0.78rem;'>⊙ Not Started</span>"
+
+    campaign_tbl = ''.join(f"""<tr>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'>{r['name']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'><span style='font-size:0.78rem;background:#0d2847;color:#4da8ff;padding:2px 8px;border-radius:8px;'>{r['plan']}</span></td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'>{r['status']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;'>{r['total_assigned']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;'>{r['completed']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;font-weight:700;color:{'#22c55e' if r['pct']>=80 else '#f59e0b' if r['pct']>0 else '#6a8aaa'};'>{r['pct']}%</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'>{status_badge(r['pct'])}</td>
+    </tr>""" for r in campaign_rows)
+
+    user_tbl = ''.join(f"""<tr>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'>{r['name']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;color:#6a8aaa;font-size:0.82rem;'>{r['email']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;'>{r['total']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;'>{r['completed']}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;font-weight:700;color:{'#22c55e' if r['pct']>=80 else '#f59e0b' if r['pct']>0 else '#6a8aaa'};'>{r['pct']}%</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;text-align:center;'>{r['avg_score'] if r['avg_score'] else '—'}</td>
+        <td style='padding:10px;border-bottom:1px solid #1a3050;'>{status_badge(r['pct'])}</td>
+    </tr>""" for r in user_rows[:50])  # cap at 50 users display
+
+    return f"""<!DOCTYPE html>
+    <html><head><title>Training Compliance Dashboard</title><style>
+    body{{font-family:'Segoe UI',Arial,sans-serif;background:#070d17;color:#ddeeff;margin:0;}}
+    .topbar{{background:#0d1a2e;border-bottom:1px solid #1a3050;padding:16px 24px;display:flex;align-items:center;gap:16px;}}
+    .topbar h1{{font-size:1.1rem;color:#4da8ff;margin:0;}}
+    .back{{color:#4da8ff;text-decoration:none;font-size:0.85rem;}}
+    .stat-row{{display:flex;gap:20px;padding:28px 24px;flex-wrap:wrap;}}
+    .stat-card{{background:#0d1a2e;border:1px solid #1a3050;border-radius:12px;padding:24px;flex:1;min-width:160px;}}
+    .stat-card strong{{display:block;font-size:2rem;font-weight:800;color:#4da8ff;}}
+    .stat-card span{{font-size:0.8rem;color:#6a8aaa;text-transform:uppercase;letter-spacing:0.08em;}}
+    .section{{padding:0 24px 40px;}}
+    .section h2{{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:16px;padding-top:16px;}}
+    table{{width:100%;border-collapse:collapse;background:#0d1a2e;border:1px solid #1a3050;border-radius:12px;overflow:hidden;}}
+    th{{background:#0a1525;text-align:left;padding:12px 10px;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#6a8aaa;border-bottom:1px solid #1a3050;}}
+    th.c{{text-align:center;}}
+    td{{padding:10px;font-size:0.88rem;}}
+    tr:hover{{background:#0f2035;}}
+    .empty{{text-align:center;padding:40px;color:#4a6080;}}
+    .badge-ok{{background:#0a3a1a;color:#22c55e;}}
+    .badge-warn{{background:#3a2a00;color:#f59e0b;}}
+    .badge-none{{background:#1a1a2a;color:#6a8aaa;}}
+    </style></head><body>
+    <div class=topbar>
+        <h1>🎓 Training Compliance Dashboard</h1>
+        <a href='/' class=back>← Back to PhishSim</a>
+    </div>
+    <div class=stat-row>
+        <div class=stat-card><strong>{total_assignments}</strong><span>Total Assigned</span></div>
+        <div class=stat-card><strong>{total_completed}</strong><span>Completed</span></div>
+        <div class=stat-card><strong style='color:{'#22c55e' if overall_pct>=80 else '#f59e0b'};'>{overall_pct}%</strong><span>Overall Completion</span></div>
+        <div class=stat-card><strong>{len(set(a.get('target_id') for a in all_assignments))}</strong><span>Employees Trained</span></div>
+    </div>
+    <div class=section>
+        <h2>📊 By Campaign</h2>
+        {'''<table><thead><tr><th>Campaign</th><th>Plan</th><th>Status</th><th class=c>Assigned</th><th class=c>Completed</th><th class=c>Rate</th><th>Status</th></tr></thead><tbody>'''+campaign_tbl+'''</tbody></table>''' if campaign_tbl else '<div class=empty>No campaigns yet.</div>'}
+    </div>
+    <div class=section>
+        <h2>👥 By Employee</h2>
+        {'''<table><thead><tr><th>Name</th><th>Email</th><th class=c>Assigned</th><th class=c>Completed</th><th class=c>Rate</th><th class=c>Avg Score</th><th>Status</th></tr></thead><tbody>'''+user_tbl+'''</tbody></table>''' if user_tbl else '<div class=empty>No training assignments yet. Launch a phishing campaign to auto-assign training.</div>'}
+    </div>
+    </body></html>"""
+
+
+@app.route('/api/training/compliance', methods=['GET'])
+def api_training_compliance():
+    """JSON compliance data for external dashboards / webhooks."""
+    campaign_id = request.args.get('campaign_id')
+    assignments = list(_store['training_assignments'].values())
+    if campaign_id:
+        assignments = [a for a in assignments if a.get('campaign_id') == campaign_id]
+    total = len(assignments)
+    completed = sum(1 for a in assignments if a.get('status') == 'completed')
+    scores = [a.get('quiz_pct') for a in assignments if a.get('quiz_pct') is not None]
+    return jsonify({
+        'total_assigned': total,
+        'completed': completed,
+        'not_started': total - completed,
+        'completion_rate': round(completed / total * 100, 1) if total > 0 else 0,
+        'avg_quiz_score': round(sum(scores) / len(scores), 1) if scores else None,
+        'by_module': {
+            m['id']: {
+                'assigned': sum(1 for a in assignments if a.get('module_id') == m['id']),
+                'completed': sum(1 for a in assignments if a.get('module_id') == m['id'] and a.get('status') == 'completed'),
+            } for m in TRAINING_MODULES
+        }
+    })
+
+@app.route('/api/training/assignments', methods=['GET'])
+def api_list_assignments():
+    """List training assignments, optionally filtered by campaign_id or target_id."""
+    campaign_id = request.args.get('campaign_id')
+    target_id = request.args.get('target_id')
+    assignments = list(_store['training_assignments'].values())
+    if campaign_id:
+        assignments = [a for a in assignments if a.get('campaign_id') == campaign_id]
+    if target_id:
+        assignments = [a for a in assignments if a.get('target_id') == target_id]
+    return jsonify({'assignments': assignments, 'total': len(assignments)})
+
+@app.route('/api/campaigns/<cid>/training-summary', methods=['GET'])
+def api_campaign_training_summary(cid):
+    """Training summary for a specific campaign."""
+    sends = [s for s in _store['campaign_sends'].values() if s.get('campaign_id') == cid]
+    assignments = [a for a in _store['training_assignments'].values() if a.get('campaign_id') == cid]
+    sent = sum(1 for s in sends if s.get('sent_at'))
+    clicked = sum(1 for s in sends if s.get('clicked_at'))
+    assigned = len(assignments)
+    completed = sum(1 for a in assignments if a.get('status') == 'completed')
+    return jsonify({
+        'campaign_id': cid,
+        'emails_sent': sent,
+        'clicked': clicked,
+        'training_assigned': assigned,
+        'training_completed': completed,
+        'completion_rate': round(completed / assigned * 100, 1) if assigned > 0 else 0,
+        'click_to_training_rate': round(assigned / clicked * 100, 1) if clicked > 0 else 0,
+    })
+
+
 
 @app.route('/api/reports/campaign/<cid>', methods=['GET'])
 def campaign_report(cid):
