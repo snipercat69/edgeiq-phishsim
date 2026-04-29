@@ -10,7 +10,7 @@ Handles:
 - Credential capture landing pages
 - Training assignment dispatch
 """
-import os, json, uuid, smtplib, ssl
+import os, json, uuid, smtplib, ssl, requests as http_requests
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -28,6 +28,9 @@ SMTP_PORT    = int(os.environ.get('SMTP_PORT', 587))
 SMTP_USER    = os.environ.get('SMTP_USER', '')
 SMTP_PASS    = os.environ.get('SMTP_PASS', '')
 SENDING_DOMAIN = os.environ.get('SENDING_DOMAIN', 'simulate.edgeiqlabs.com')
+MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', '')
+MAILGUN_API_URL = f'https://api.mailgun.net/v3/{SENDING_DOMAIN}/messages'
+FROM_NAME    = os.environ.get('FROM_NAME', 'EdgeIQ Security')
 FROM_NAME    = os.environ.get('FROM_NAME', 'EdgeIQ Security')
 APP_URL      = os.environ.get('APP_URL', 'https://simulate.edgeiqlabs.com')
 
@@ -50,16 +53,11 @@ def _now():
     return datetime.utcnow().isoformat()
 
 def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
-    """Send email via SMTP. Returns (success, error_detail)."""
-    if not SMTP_USER or not SMTP_PASS:
-        detail = 'SMTP_USER or SMTP_PASS missing'
-        print(f"[DEBUG] SMTP not configured — would send to {to_email}: {subject} | {detail}")
+    """Send email via Mailgun HTTP API. Returns (success, error_detail)."""
+    if not MAILGUN_API_KEY:
+        detail = 'MAILGUN_API_KEY missing'
+        print(f"[DEBUG] Mailgun not configured — would send to {to_email}: {subject} | {detail}")
         return True, detail
-
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>"
-    msg['To'] = to_email
 
     # Add tracking pixel
     if tracking_pixel_id:
@@ -67,25 +65,28 @@ def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
         pixel_html = f'<img src="{pixel_url}" width="1" height="1" style="display:none" />'
         html_body = pixel_html + html_body
 
-    html_part = MIMEText(html_body, 'html')
-    msg.attach(html_part)
-
     try:
-        print(
-            f"[DEBUG] SMTP attempt host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} "
-            f"from=noreply@{SENDING_DOMAIN} to={to_email}"
+        resp = http_requests.post(
+            MAILGUN_API_URL,
+            auth=('api', MAILGUN_API_KEY),
+            data={
+                'from': f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>",
+                'to': to_email,
+                'subject': subject,
+                'html': html_body,
+            },
+            timeout=15,
         )
-        context = ssl.create_default_context()
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
-            server.set_debuglevel(1)
-            server.starttls(context=context)
-            server.login(SMTP_USER, SMTP_PASS, timeout=10)
-            server.sendmail(f"noreply@{SENDING_DOMAIN}", to_email, msg.as_string(), timeout=10)
-        print(f"[DEBUG] SMTP send succeeded to {to_email}")
-        return True, None
+        if resp.status_code in (200, 201):
+            print(f"[DEBUG] Mailgun send OK to {to_email}: {resp.status_code}")
+            return True, None
+        else:
+            detail = f"status={resp.status_code} {resp.text[:200]}"
+            print(f"[ERROR] Mailgun send failed: {detail}")
+            return False, detail
     except Exception as e:
         detail = f"{type(e).__name__}: {e}"
-        print(f"[ERROR] SMTP send failed host={SMTP_HOST} port={SMTP_PORT} user={SMTP_USER} detail={detail}")
+        print(f"[ERROR] Mailgun send exception: {detail}")
         return False, detail
 
 def _render_template(template_html, template_vars):
