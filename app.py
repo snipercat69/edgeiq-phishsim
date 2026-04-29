@@ -156,7 +156,7 @@ def smtp_debug_test():
         result['connect_error'] = str(e)
     return jsonify(result)
 
-\n@app.route('/health', methods=['GET'])
+@app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'service': 'edgeiq-phishsim', 'version': '1.0.0'})
 
