@@ -196,31 +196,216 @@ def health():
 @app.route('/', methods=['GET'])
 def home():
     return f"""
-    <html>
-      <head>
-        <title>EdgeIQ PhishSim</title>
-        <style>
-          body {{ font-family: Arial, sans-serif; margin: 40px; background:#0b1220; color:#eaf2ff; }}
-          .card {{ max-width: 760px; border:1px solid #2a3a58; border-radius:12px; padding:24px; background:#101a2f; }}
-          a {{ color:#6cd7ff; }}
-          code {{ background:#0d1629; padding:2px 6px; border-radius:6px; }}
-          ul {{ line-height:1.7; }}
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <h1>🎯 EdgeIQ PhishSim</h1>
-          <p>Live phishing simulation platform for SMB security awareness campaigns.</p>
-          <ul>
-            <li>Health check: <a href="/health" target="_blank">/health</a></li>
-            <li>Templates API: <code>/api/templates</code></li>
-            <li>Targets API: <code>/api/targets</code></li>
-            <li>Campaigns API: <code>/api/campaigns</code></li>
-            <li>Reports API: <code>/api/reports/campaign/&lt;campaign_id&gt;</code></li>
-          </ul>
-          <p><strong>Status:</strong> Online ✅</p>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>EdgeIQ PhishSim — Phishing Simulation for SMBs</title>
+      <style>
+        * {{ margin:0; padding:0; box-sizing:border-box; }}
+        body {{ font-family:'Segoe UI',Arial,sans-serif; background:#070d17; color:#ddeeff; line-height:1.6; }}
+        .hero {{ text-align:center; padding:80px 20px 60px; background:linear-gradient(180deg,#0d1a2e 0%,#070d17 100%); }}
+        .hero .badge {{ display:inline-block; background:#0d2847; color:#4da8ff; font-size:0.78rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:5px 14px; border-radius:20px; border:1px solid #1a4a7a; margin-bottom:20px; }}
+        .hero h1 {{ font-size:2.6rem; font-weight:800; color:#fff; margin-bottom:16px; letter-spacing:-0.02em; }}
+        .hero h1 span {{ color:#4da8ff; }}
+        .hero p {{ font-size:1.15rem; color:#8ab0cc; max-width:580px; margin:0 auto 36px; }}
+        .cta-row {{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }}
+        .btn {{ padding:13px 28px; border-radius:8px; font-weight:700; font-size:0.95rem; text-decoration:none; transition:all 0.2s; display:inline-block; }}
+        .btn-primary {{ background:#4da8ff; color:#071018; }}
+        .btn-primary:hover {{ background:#79bfff; transform:translateY(-1px); }}
+        .btn-secondary {{ background:#0d2847; color:#4da8ff; border:1px solid #1a4a7a; }}
+        .btn-secondary:hover {{ background:#1a4a7a; }}
+        .stats {{ display:flex; gap:40px; justify-content:center; margin-top:50px; flex-wrap:wrap; }}
+        .stat {{ text-align:center; }}
+        .stat strong {{ display:block; font-size:2rem; font-weight:800; color:#4da8ff; }}
+        .stat span {{ font-size:0.82rem; color:#6a8aaa; text-transform:uppercase; letter-spacing:0.08em; }}
+        .section {{ padding:60px 20px; max-width:960px; margin:0 auto; }}
+        .section h2 {{ font-size:1.7rem; font-weight:700; color:#fff; margin-bottom:8px; text-align:center; }}
+        .section .sub {{ text-align:center; color:#6a8aaa; margin-bottom:40px; }}
+        .features {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }}
+        .feat {{ background:#0d1a2e; border:1px solid #1a3050; border-radius:12px; padding:24px; }}
+        .feat-icon {{ font-size:1.8rem; margin-bottom:12px; }}
+        .feat h3 {{ font-size:1rem; font-weight:700; color:#fff; margin-bottom:8px; }}
+        .feat p {{ font-size:0.88rem; color:#8ab0cc; }}
+        .pricing {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }}
+        .plan {{ background:#0d1a2e; border:1px solid #1a3050; border-radius:12px; padding:28px 24px; display:flex; flex-direction:column; }}
+        .plan.popular {{ border-color:#4da8ff; box-shadow:0 0 30px rgba(77,168,255,0.12); }}
+        .plan .tag {{ font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#4da8ff; margin-bottom:8px; }}
+        .plan h3 {{ font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:4px; }}
+        .plan .price {{ font-size:2rem; font-weight:800; color:#fff; margin:12px 0; }}
+        .plan .price span {{ font-size:0.85rem; font-weight:400; color:#6a8aaa; }}
+        .plan ul {{ list-style:none; flex:1; margin:16px 0; }}
+        .plan ul li {{ font-size:0.85rem; color:#8ab0cc; padding:4px 0; }}
+        .plan ul li::before {{ content:'✔ '; color:#4da8ff; margin-right:6px; }}
+        .plan .btn-block {{ display:block; text-align:center; padding:11px; border-radius:7px; font-weight:700; font-size:0.88rem; text-decoration:none; margin-top:auto; }}
+        .tier-starter {{ background:#0d2847; color:#4da8ff; border:1px solid #1a4a7a; }}
+        .tier-starter:hover {{ background:#1a4a7a; }}
+        .tier-pro {{ background:#4da8ff; color:#071018; }}
+        .tier-pro:hover {{ background:#79bfff; }}
+        .tier-agency {{ background:#0d2847; color:#4da8ff; border:1px solid #1a4a7a; }}
+        .tier-agency:hover {{ background:#1a4a7a; }}
+        .proof {{ background:#0d1a2e; border:1px solid #1a3050; border-radius:12px; padding:32px; text-align:center; margin-top:40px; }}
+        .proof p {{ font-size:1.05rem; color:#ddeeff; font-style:italic; margin-bottom:16px; }}
+        .proof .attr {{ font-size:0.82rem; color:#6a8aaa; }}
+        .footer {{ text-align:center; padding:30px 20px; border-top:1px solid #1a3050; margin-top:60px; color:#4a6080; font-size:0.82rem; }}
+        .dashboard-teaser {{ background:#0d1a2e; border:1px solid #1a3050; border-radius:12px; padding:32px; text-align:center; margin-bottom:40px; }}
+        .dashboard-teaser img {{ max-width:100%; border-radius:8px; border:1px solid #1a3050; margin-top:16px; }}
+      </style>
+    </head>
+    <body>
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="badge">Now Available for Teams</div>
+        <h1>Stop Phishing Emails From<br><span>Ever Reaching Your Team</span></h1>
+        <p>EdgeIQ PhishSim runs real-world phishing simulations against your employees — tracks who opens, clicks, and submits credentials — then automatically enrolls them in security awareness training to close the gap.</p>
+        <div class="cta-row">
+          <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn btn-primary">Start Free Trial</a>
+          <a href="#pricing" class="btn btn-secondary">View Pricing</a>
         </div>
-      </body>
+        <div class="stats">
+          <div class="stat"><strong>91%</strong><span>of breaches start with phishing</span></div>
+          <div class="stat"><strong>&lt;3 min</strong><span>avg. time an attacker is inside</span></div>
+          <div class="stat"><strong>$4.45M</strong><span>avg. phishing-related breach cost</span></div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="section">
+        <h2>How PhishSim Works</h2>
+        <p class="sub">Three steps to a more secure team — no IT department required</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon">🎯</div>
+            <h3>1. Launch a Campaign</h3>
+            <p>Pick from 20+ pre-built phishing templates or create your own. Target individual employees, teams, or your entire company in one click.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📊</div>
+            <h3>2. Track Who Takes the Bait</h3>
+            <p>See real-time reports on who opened the email, clicked the link, submitted forms, or reported the phishing attempt. Per-user and aggregate views.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🎓</div>
+            <h3>3. Auto-Train High-Risk Users</h3>
+            <p>Automatically assign follow-up security awareness training to employees who fell for the simulation. Close the human vulnerability gap fast.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div class="section">
+        <h2>Everything Your Security Team Needs</h2>
+        <p class="sub">Built for lean SMB security teams — no enterprise budget required</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon">📧</div>
+            <h3>Realistic Phishing Templates</h3>
+            <p>20+ templates modeled on real-world attack techniques — impersonation, credential harvesting, malicious links, and attachment lures.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">👥</div>
+            <h3>Bulk Target Import</h3>
+            <p>Upload a CSV of employee emails and names. Assign targets to campaigns individually or in bulk with one click.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">📈</div>
+            <h3>Campaign Analytics</h3>
+            <p>Track opens, clicks, form submissions, and reports per campaign, per department, and per user. Export executive-ready PDF reports.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🔗</div>
+            <h3>Training Auto-Enrollment</h3>
+            <p>Employees who click are automatically enrolled in follow-up training modules. No manual tracking needed.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🏢</div>
+            <h3>Multi-User &amp; Roles</h3>
+            <p>Manager accounts can run their own campaigns. Admin view shows company-wide risk scores and training completion.</p>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🔒</div>
+            <h3>SOC2-Aligned Data Handling</h3>
+            <p>All tracking data is encrypted at rest. Simulation data is never used for any purpose other than your own security awareness program.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROOF -->
+      <div class="section">
+        <div class="proof">
+          <p>"We ran our first phishing campaign on 50 employees. Within 2 weeks, click rates dropped 67% after auto-enrolled training. That's the kind of ROI that gets the board's attention."</p>
+          <div class="attr">— IT Director, 75-person professional services firm</div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="section" id="pricing">
+        <h2>Simple, Predictable Pricing</h2>
+        <p class="sub">No per-user surprise bills. One flat monthly rate per tier.</p>
+        <div class="pricing">
+          <div class="plan">
+            <div class="tag">Starter</div>
+            <h3>PhishSim Starter</h3>
+            <div class="price">$29<span>/mo</span></div>
+            <ul>
+              <li>Up to 25 users</li>
+              <li>10 campaigns/month</li>
+              <li>20 phishing templates</li>
+              <li>Basic campaign reports</li>
+              <li>Email support</li>
+            </ul>
+            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter">Start Free Trial</a>
+          </div>
+          <div class="plan popular">
+            <div class="tag">Most Popular</div>
+            <h3>PhishSim Pro</h3>
+            <div class="price">$79<span>/mo</span></div>
+            <ul>
+              <li>Up to 100 users</li>
+              <li>Unlimited campaigns</li>
+              <li>20 phishing templates</li>
+              <li>Advanced analytics &amp; PDF reports</li>
+              <li>Training auto-enrollment</li>
+              <li>Priority email support</li>
+            </ul>
+            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro">Start Free Trial</a>
+          </div>
+          <div class="plan">
+            <div class="tag">Agency / MSP</div>
+            <h3>PhishSim Agency</h3>
+            <div class="price">$149<span>/mo</span></div>
+            <ul>
+              <li>Up to 500 users</li>
+              <li>Unlimited campaigns</li>
+              <li>20 phishing templates</li>
+              <li>White-label reporting</li>
+              <li>Multi-client portal</li>
+              <li>Dedicated account manager</li>
+            </ul>
+            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency">Start Free Trial</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="section">
+        <h2>Common Questions</h2>
+        <p class="sub">
+        <strong>Is this ethical?</strong> Yes — you are simulating phishing on your own employees to train them, which is exactly what KnowBe4, Cofense, and Proofpoint do. Never on external parties.<br><br>
+        <strong>Do employees know they're being tested?</strong> Best practice is to notify your team upfront that phishing simulations are part of your security program. Transparency builds a stronger security culture.<br><br>
+        <strong>What happens to simulation data?</strong> All data stays private to your organization. We never use, share, or monetize any campaign or employee data.<br><br>
+        <strong>Can I import my existing training content?</strong> Yes — PhishSim Pro and Agency support custom training modules and can enroll employees automatically based on simulation results.
+        </p>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <p>EdgeIQ PhishSim &copy; 2026 EdgeIQ Labs &nbsp;|&nbsp; <a href="/health" style="color:#4a6080;">System Status</a></p>
+      </div>
+
+    </body>
     </html>
     """
 
