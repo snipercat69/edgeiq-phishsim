@@ -332,6 +332,33 @@ def home():
         </div>
       </div>
 
+      <!-- TRAINING MODULES -->
+      <div class="section">
+        <h2>🎓 Training Modules Included</h2>
+        <p class="sub">Every phishing simulation automatically enrolls at-risk employees in the right module. Managers can track completion in the compliance dashboard.</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-icon">🎯</div>
+            <h3>Phishing 101: How to Spot a Scam</h3>
+            <p>Red flags, sender analysis, link inspection, urgent-action demands, and what to do when in doubt. 8 minutes + 5-question quiz.</p>
+            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Starter ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🔑</div>
+            <h3>Password Security: Best Practices</h3>
+            <p>Strong password creation, password manager adoption, 2FA setup, and why password reuse is dangerous. 6 minutes + 5-question quiz.</p>
+            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+          </div>
+          <div class="feat">
+            <div class="feat-icon">🎭</div>
+            <h3>Social Engineering: The Human Firewall</h3>
+            <p>Pretexting, baiting, tailgating, quid pro quo, and how to verify before you trust. 10 minutes + 5-question quiz.</p>
+            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+          </div>
+        </div>
+        <p style="text-align:center;margin-top:20px;color:#6a8aaa;font-size:0.85rem;">Modules are auto-assigned when an employee clicks a phishing simulation. Starter plans include Phishing 101. Pro and Agency include all three.</p>
+      </div>
+
       <!-- PROOF -->
       <div class="section">
         <div class="proof">
