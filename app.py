@@ -334,29 +334,55 @@ def home():
 
       <!-- TRAINING MODULES -->
       <div class="section">
-        <h2>🎓 Training Modules Included</h2>
-        <p class="sub">Every phishing simulation automatically enrolls at-risk employees in the right module. Managers can track completion in the compliance dashboard.</p>
-        <div class="features">
-          <div class="feat">
-            <div class="feat-icon">🎯</div>
-            <h3>Phishing 101: How to Spot a Scam</h3>
-            <p>Red flags, sender analysis, link inspection, urgent-action demands, and what to do when in doubt. 8 minutes + 5-question quiz.</p>
-            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Starter ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+        <h2>🎓 Training Modules — What's Included</h2>
+        <p class="sub">Security awareness training that auto-enrolls employees who click. Choose the plan that fits your team.</p>
+        <div class="pricing">
+          <div class="plan">
+            <div class="tag">Starter</div>
+            <h3>PhishSim Starter</h3>
+            <div class="price">$29<span>/mo</span></div>
+            <ul>
+              <li><strong>Phishing 101: How to Spot a Scam</strong></li>
+              <li>Red flags, sender analysis, link inspection</li>
+              <li>Urgent-action demand recognition</li>
+              <li>8 min + 5-question quiz</li>
+              <li>Completion certificate</li>
+            </ul>
+            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter">Start Free Trial</a>
           </div>
-          <div class="feat">
-            <div class="feat-icon">🔑</div>
-            <h3>Password Security: Best Practices</h3>
-            <p>Strong password creation, password manager adoption, 2FA setup, and why password reuse is dangerous. 6 minutes + 5-question quiz.</p>
-            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+          <div class="plan popular">
+            <div class="tag">Most Popular</div>
+            <h3>PhishSim Pro</h3>
+            <div class="price">$79<span>/mo</span></div>
+            <ul>
+              <li><strong>✓ Everything in Starter</strong></li>
+              <li><strong>+ Password Security: Best Practices</strong></li>
+              <li>Password managers, 2FA, reuse prevention</li>
+              <li><strong>+ Social Engineering: The Human Firewall</strong></li>
+              <li>Pretexting, baiting, tailgating defense</li>
+              <li>All 3 modules: 24 min total content</li>
+              <li>Training auto-enrollment on click</li>
+              <li>Manager compliance dashboard</li>
+            </ul>
+            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro">Start Free Trial</a>
           </div>
-          <div class="feat">
-            <div class="feat-icon">🎭</div>
-            <h3>Social Engineering: The Human Firewall</h3>
-            <p>Pretexting, baiting, tailgating, quid pro quo, and how to verify before you trust. 10 minutes + 5-question quiz.</p>
-            <div style="margin-top:12px;"><span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Pro ✓</span> <span style="background:#0d2847;color:#4da8ff;font-size:0.72rem;padding:3px 8px;border-radius:8px;border:1px solid #1a4a7a;">Agency ✓</span></div>
+          <div class="plan">
+            <div class="tag">Agency / MSP</div>
+            <h3>PhishSim Agency</h3>
+            <div class="price">$149<span>/mo</span></div>
+            <ul>
+              <li><strong>✓ Everything in Pro</strong></li>
+              <li>White-label training portal</li>
+              <li>Multi-client reporting</li>
+              <li>Custom training assignment rules</li>
+              <li>Dedicated account manager</li>
+              <li>All 3 modules included</li>
+              <li>Priority support</li>
+            </ul>
+            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency">Start Free Trial</a>
           </div>
         </div>
-        <p style="text-align:center;margin-top:20px;color:#6a8aaa;font-size:0.85rem;">Modules are auto-assigned when an employee clicks a phishing simulation. Starter plans include Phishing 101. Pro and Agency include all three.</p>
+        <p style="text-align:center;margin-top:24px;color:#4da8ff;font-size:0.9rem;">⭐ Pro tip: Annual billing saves ~28% — 2 months free &nbsp;|&nbsp; <a href="#pricing" style="color:#4da8ff;">See annual pricing ↓</a></p>
       </div>
 
       <!-- PROOF -->
