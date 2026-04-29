@@ -11,6 +11,7 @@ Handles:
 - Training assignment dispatch
 """
 import os, json, uuid, smtplib, ssl, tempfile, threading
+import requests as http_requests
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -31,6 +32,7 @@ SENDING_DOMAIN = os.environ.get('SENDING_DOMAIN', 'simulate.edgeiqlabs.com')
 FROM_NAME    = os.environ.get('FROM_NAME', 'EdgeIQ Security')
 APP_URL      = os.environ.get('APP_URL', 'https://simulate.edgeiqlabs.com')
 STORE_PATH   = os.environ.get('STORE_PATH', '/tmp/edgeiq-phishsim-store.json')
+MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', '')
 
 # In-memory store (MVP — replace with PostgreSQL for production)
 # Format: { campaign_id: { ... }, target_id: { ... }, ... }
@@ -91,7 +93,41 @@ def _now():
     return datetime.utcnow().isoformat()
 
 def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
-    """Send email via SMTP. Returns (success, error_detail)."""
+    """Send email (Mailgun API preferred, SMTP fallback). Returns (success, error_detail)."""
+
+    # Add tracking pixel
+    if tracking_pixel_id:
+        pixel_url = f"{APP_URL}/track/open/{tracking_pixel_id}"
+        pixel_html = f'<img src="{pixel_url}" width="1" height="1" style="display:none" />'
+        html_body = pixel_html + html_body
+
+    # Preferred path: Mailgun HTTP API (more reliable on Render)
+    if MAILGUN_API_KEY:
+        try:
+            api_url = f"https://api.mailgun.net/v3/{SENDING_DOMAIN}/messages"
+            resp = http_requests.post(
+                api_url,
+                auth=('api', MAILGUN_API_KEY),
+                data={
+                    'from': f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>",
+                    'to': to_email,
+                    'subject': subject,
+                    'html': html_body,
+                },
+                timeout=20,
+            )
+            if resp.status_code in (200, 201):
+                print(f"[DEBUG] Mailgun API send succeeded to {to_email}")
+                return True, None
+            detail = f"HTTP {resp.status_code}: {resp.text[:200]}"
+            print(f"[ERROR] Mailgun API send failed: {detail}")
+            return False, detail
+        except Exception as e:
+            detail = f"{type(e).__name__}: {e}"
+            print(f"[ERROR] Mailgun API exception: {detail}")
+            return False, detail
+
+    # Fallback path: SMTP
     if not SMTP_USER or not SMTP_PASS:
         detail = 'SMTP_USER or SMTP_PASS missing'
         print(f"[DEBUG] SMTP not configured — would send to {to_email}: {subject} | {detail}")
@@ -101,12 +137,6 @@ def _send_email(to_email, subject, html_body, tracking_pixel_id=None):
     msg['Subject'] = subject
     msg['From'] = f"{FROM_NAME} <noreply@{SENDING_DOMAIN}>"
     msg['To'] = to_email
-
-    # Add tracking pixel
-    if tracking_pixel_id:
-        pixel_url = f"{APP_URL}/track/open/{tracking_pixel_id}"
-        pixel_html = f'<img src="{pixel_url}" width="1" height="1" style="display:none" />'
-        html_body = pixel_html + html_body
 
     html_part = MIMEText(html_body, 'html')
     msg.attach(html_part)
