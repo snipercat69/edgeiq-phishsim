@@ -289,7 +289,7 @@ def home():
           <div class="feat">
             <div class="feat-icon">🎓</div>
             <h3>3. Auto-Train High-Risk Users</h3>
-            <p>Automatically assign follow-up security awareness training to employees who fell for the simulation. Close the human vulnerability gap fast.</p>
+            <p>Automatically enroll employees who click into structured security training — <strong>Phishing 101</strong>, <strong>Password Security</strong>, and <strong>Social Engineering</strong> — with quizzes and certificates.</p>
           </div>
         </div>
       </div>
@@ -317,12 +317,12 @@ def home():
           <div class="feat">
             <div class="feat-icon">🔗</div>
             <h3>Training Auto-Enrollment</h3>
-            <p>Employees who click are automatically enrolled in follow-up training modules. No manual tracking needed.</p>
+            <p>Employees who click are automatically assigned the relevant training module — <strong>Phishing 101</strong>, <strong>Password Security</strong>, or <strong>Social Engineering</strong> — with an interactive quiz and certificate on completion.</p>
           </div>
           <div class="feat">
             <div class="feat-icon">🏢</div>
-            <h3>Multi-User &amp; Roles</h3>
-            <p>Manager accounts can run their own campaigns. Admin view shows company-wide risk scores and training completion.</p>
+            <h3>Manager Compliance Dashboard</h3>
+            <p>See team-wide training completion rates, per-user progress, quiz scores, and certificate records — all in one view.</p>
           </div>
           <div class="feat">
             <div class="feat-icon">🔒</div>
