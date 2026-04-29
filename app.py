@@ -382,7 +382,7 @@ def home():
             <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency">Start Free Trial</a>
           </div>
         </div>
-        <p style="text-align:center;margin-top:24px;color:#4da8ff;font-size:0.9rem;">⭐ Pro tip: Annual billing saves ~28% — 2 months free &nbsp;|&nbsp; <a href="#pricing" style="color:#4da8ff;">See annual pricing ↓</a></p>
+        <p style="text-align:center;margin-top:24px;color:#4da8ff;font-size:0.9rem;">Annual billing saves ~28% — 2 months free &nbsp;|&nbsp; <a href="#pricing" style="color:#4da8ff;">See annual pricing ↓</a></p>
       </div>
 
       <!-- PROOF -->
