@@ -261,7 +261,7 @@ def home():
         <h1>Stop Phishing Emails From<br><span>Ever Reaching Your Team</span></h1>
         <p>EdgeIQ PhishSim runs real-world phishing simulations against your employees — tracks who opens, clicks, and submits credentials — then automatically enrolls them in security awareness training to close the gap.</p>
         <div class="cta-row">
-          <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn btn-primary">Start Free Trial</a>
+          <a href="javascript:void(0)" onclick="startCheckout('starter');return false;" class="btn btn-primary">Start Free Trial</a>
           <a href="#pricing" class="btn btn-secondary">View Pricing</a>
         </div>
         <div class="stats">
@@ -348,7 +348,7 @@ def home():
               <li>8 min + 5-question quiz</li>
               <li>Completion certificate</li>
             </ul>
-            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter">Start Free Trial</a>
+            <a href="javascript:void(0)" onclick="startCheckout('starter');return false;" class="btn-block tier-starter">Start Free Trial</a>
           </div>
           <div class="plan popular">
             <div class="tag">Most Popular</div>
@@ -364,7 +364,7 @@ def home():
               <li>Training auto-enrollment on click</li>
               <li>Manager compliance dashboard</li>
             </ul>
-            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro">Start Free Trial</a>
+            <a href="javascript:void(0)" onclick="startCheckout('pro');return false;" class="btn-block tier-pro">Start Free Trial</a>
           </div>
           <div class="plan">
             <div class="tag">Agency / MSP</div>
@@ -379,7 +379,7 @@ def home():
               <li>All 3 modules included</li>
               <li>Priority support</li>
             </ul>
-            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency">Start Free Trial</a>
+            <a href="javascript:void(0)" onclick="startCheckout('agency');return false;" class="btn-block tier-agency">Start Free Trial</a>
           </div>
         </div>
         <p style="text-align:center;margin-top:24px;color:#4da8ff;font-size:0.9rem;">Annual billing saves ~28% — 2 months free &nbsp;|&nbsp; <a href="#pricing" style="color:#4da8ff;">See annual pricing ↓</a></p>
@@ -424,8 +424,8 @@ def home():
               <li>Basic campaign reports</li>
               <li>Email support</li>
             </ul>
-            <a href="https://buy.stripe.com/3cI28tdyjgRLbQoaIM7wA1C" class="btn-block tier-starter" style="margin-top:8px;">Monthly — $29/mo</a>
-            <a href="https://buy.stripe.com/eVqbJ39i3bxr07G5os7wA1F" class="btn-block tier-starter" style="margin-top:4px;font-size:0.8rem;">Annual — $249/yr</a>
+            <a href="javascript:void(0)" onclick="startCheckout('starter');return false;" class="btn-block tier-starter" style="margin-top:8px;">Monthly — $29/mo</a>
+            <a href="javascript:void(0)" onclick="startCheckout('starter');return false;" class="btn-block tier-starter" style="margin-top:4px;font-size:0.8rem;">Annual — $249/yr</a>
           </div>
           <div class="plan popular">
             <div class="tag">Most Popular</div>
@@ -449,8 +449,8 @@ def home():
               <li>Training auto-enrollment</li>
               <li>Priority email support</li>
             </ul>
-            <a href="https://buy.stripe.com/5kQ8wR9i3bxrbQoaIM7wA1D" class="btn-block tier-pro" style="margin-top:8px;">Monthly — $79/mo</a>
-            <a href="https://buy.stripe.com/aFa9AV8dZ7hbcUs4ko7wA1G" class="btn-block tier-pro" style="margin-top:4px;font-size:0.8rem;">Annual — $699/yr</a>
+            <a href="javascript:void(0)" onclick="startCheckout('pro');return false;" class="btn-block tier-pro" style="margin-top:8px;">Monthly — $79/mo</a>
+            <a href="javascript:void(0)" onclick="startCheckout('pro');return false;" class="btn-block tier-pro" style="margin-top:4px;font-size:0.8rem;">Annual — $699/yr</a>
           </div>
           <div class="plan">
             <div class="tag">Agency / MSP</div>
@@ -474,8 +474,8 @@ def home():
               <li>Multi-client portal</li>
               <li>Dedicated account manager</li>
             </ul>
-            <a href="https://buy.stripe.com/7sYcN7cuf6d7bQoaIM7wA1E" class="btn-block tier-agency" style="margin-top:8px;">Monthly — $149/mo</a>
-            <a href="https://buy.stripe.com/00w9AVeCnatn8Ec2cg7wA1H" class="btn-block tier-agency" style="margin-top:4px;font-size:0.8rem;">Annual — $1,299/yr</a>
+            <a href="javascript:void(0)" onclick="startCheckout('agency');return false;" class="btn-block tier-agency" style="margin-top:8px;">Monthly — $149/mo</a>
+            <a href="javascript:void(0)" onclick="startCheckout('agency');return false;" class="btn-block tier-agency" style="margin-top:4px;font-size:0.8rem;">Annual — $1,299/yr</a>
           </div>
         </div>
       </div>
@@ -495,6 +495,26 @@ def home():
       <div class="footer">
         <p>EdgeIQ PhishSim &copy; 2026 EdgeIQ Labs &nbsp;|&nbsp; <a href="/health" style="color:#4a6080;">System Status</a></p>
       </div>
+
+      <script>
+      async function startCheckout(plan) {
+        var email = prompt("Enter your email address to continue:");
+        if (!email) return;
+        email = email.trim();
+        if (!email.includes("@")) { alert("Please enter a valid email."); return; }
+        try {
+          var resp = await fetch("https://api.edgeiqlabs.com/phishsim-checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ plan: plan, email: email })
+          });
+          if (!resp.ok) { alert("Something went wrong. Please try again."); return; }
+          var data = await resp.json();
+          if (data.url) { window.location.href = data.url; }
+          else { alert("Could not start checkout. Please try again."); }
+        } catch(e) { alert("Network error. Please check your connection and try again."); }
+      }
+      </script>
 
     </body>
     </html>
